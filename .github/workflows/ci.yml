@@ -1,4 +1,5 @@
 
+
 name: SmartCI Pipeline
 
 on:
@@ -20,11 +21,19 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Smart Build Cache
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run automated tests
-        run: |
-          python -m pytest -v
+        run: python -m pytest -v
