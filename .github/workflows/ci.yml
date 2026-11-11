@@ -91,9 +91,16 @@ jobs:
       - name: Capture test logs
         if: always()
         run: python -m pytest -v > build.log 2>&1 || true
+    - name: Summarize build logs with Gemini
+      if: always()
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: python scripts/summarize_logs.py
 
-      - name: Summarize build logs with Gemini
-        if: always()
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/summarize_logs.py
+    - name: Train Build Failure Prediction Model
+      if: always()
+      run: python ml/train_model.py
+
+    - name: Predict Build Failure
+      if: always()
+      run: python ml/predict_build.py
