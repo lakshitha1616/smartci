@@ -87,3 +87,13 @@ jobs:
           steps.changes.outputs.inventory != 'true' &&
           steps.changes.outputs.pricing != 'true'
         run: echo "No relevant source or test changes detected. Skipping tests."
+
+      - name: Capture test logs
+        if: always()
+        run: python -m pytest -v > build.log 2>&1 || true
+
+      - name: Summarize build logs with Gemini
+        if: always()
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/summarize_logs.py
